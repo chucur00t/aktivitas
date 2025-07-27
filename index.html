@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Pencatatan & Validasi Aktivitas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            --tw-ring-color: #a5b4fc;
+            --tw-border-color: #6366f1;
+            box-shadow: 0 0 0 2px var(--tw-ring-color);
+            border-color: var(--tw-border-color);
+            outline: none;
+        }
+        .form-input:disabled {
+            background-color: #e5e7eb;
+            color: #6b7280;
+        }
+        .file-drop-zone.drag-over {
+            background-color: #eef2ff;
+            border-color: #6366f1;
+        }
+        .nav-link.active {
+            background-color: #eef2ff;
+            color: #4338ca;
+            font-weight: 600;
+        }
+        .sub-nav-link.active {
+            color: #4338ca;
+            font-weight: 600;
+        }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details > summary .chevron { transition: transform 0.2s ease-in-out; }
+        details[open] > summary .chevron { transform: rotate(90deg); }
+        .action-btn:disabled {
+            background-color: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+            border-color: transparent;
+        }
+        .action-btn:disabled:hover {
+            background-color: #e5e7eb;
+        }
+        .segmented-control-label {
+            display: block;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        .segmented-control input[type="radio"] {
+            display: none;
+        }
+        .segmented-control input[type="radio"]:checked + .segmented-control-label {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .report-tab, .tugas-tab-btn {
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            color: #6b7280;
+            border-radius: 0.375rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease-in-out;
+        }
+        .report-tab:hover, .tugas-tab-btn:hover {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .report-tab.active-tab, .tugas-tab-btn.active-tab {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .report-tab.active-tab {
+             border-bottom-color: #4f46e5;
+        }
+        .tugas-tab-btn.active-tab {
+             background-color: #eef2ff;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 18px;
+            height: 18px;
+            border-radius: 9999px;
+            background-color: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
+        /* Sidebar styles for mobile */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="relative flex min-h-screen">
+        <!-- Sidebar/Navigasi Kiri -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 bg-white border-r border-gray-200 w-64 flex-col z-30 transform -translate-x-full md:relative md:translate-x-0">
+            <div class="flex items-center justify-center h-16 border-b border-gray-200 shrink-0">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="ml-2 text-xl font-bold text-gray-800">e-Activity</span>
+                </div>
+            </div>
+            <nav id="sidebar-nav" class="flex-1 overflow-y-auto py-4 space-y-1">
+                <a href="#pengumuman" class="nav-link flex items-center px-6 py-3 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600" data-target="page-pengumuman">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688 0-1.25-.562-1.25-1.25s.562-1.25 1.25-1.25h3.32c.688 0 1.25.562 1.25 1.25s-.562 1.25-1.25 1.25h-3.32zM9.09 11.59V7.12c0-.688.562-1.25 1.25-1.25h3.32c.688 0 1.25.562 1.25 1.25v4.47c0 .688-.562 1.25-1.25 1.25h-3.32c-.688 0-1.25-.562-1.25-1.25z" /><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 21.334c-4.42 0-8-3.58-8-8 0-4.42 3.58-8 8-8s8 3.58 8 8c0 4.42-3.58 8-8 8z" /></svg>
+                    <span class="ml-4">Pengumuman</span>
+                </a>
+                <a href="#tambah-aktivitas" class="nav-link flex items-center px-6 py-3 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 active" data-target="page-tambah-aktivitas">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    <span class="ml-4">Tambah Aktivitas</span>
+                </a>
+                <details class="group">
+                    <summary class="flex items-center justify-between px-6 py-3 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer">
+                        <div class="flex items-center"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="ml-4">Validasi Aktivitas</span></div>
+                        <svg class="h-5 w-5 chevron text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                    </summary>
+                    <div class="pl-12 py-1 space-y-1">
+                        <a href="#menunggu-validasi" class="sub-nav-link flex items-center py-2 text-sm text-gray-500 hover:text-indigo-600" data-target="page-menunggu-validasi">Menunggu Validasi</a>
+                        <a href="#disetujui" class="sub-nav-link flex items-center py-2 text-sm text-gray-500 hover:text-indigo-600" data-target="page-disetujui">Disetujui</a>
+                        <a href="#perlu-perbaikan" class="sub-nav-link flex items-center py-2 text-sm text-gray-500 hover:text-indigo-600" data-target="page-perlu-perbaikan">Perlu Perbaikan</a>
+                        <a href="#ditolak" class="sub-nav-link flex items-center py-2 text-sm text-gray-500 hover:text-indigo-600" data-target="page-ditolak">Ditolak</a>
+                    </div>
+                </details>
+                <a href="#selesai" class="nav-link flex items-center px-6 py-3 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600" data-target="page-selesai">
+                     <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="ml-4">Aktivitas Selesai</span>
+                </a>
+                <a href="#laporan" class="nav-link flex items-center px-6 py-3 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600" data-target="page-laporan">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                    <span class="ml-4">Laporan</span>
+                </a>
+                <a href="#tim-kerja" class="nav-link flex items-center px-6 py-3 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600" data-target="page-tim-kerja">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-4.67c.12-.24.232-.49.335-.737m-3.058 3.058A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-4.67c.12-.24.232-.49.335-.737m-3.058 3.058l-3.058-3.058m0 0a2.5 2.5 0 10-3.536 3.536M12 12a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" /></svg>
+                    <span class="ml-4">Tim Kerja</span>
+                </a>
+                 <hr class="mx-6 my-2 border-gray-200">
+                 <details class="group">
+                    <summary class="flex items-center justify-between px-6 py-3 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 cursor-pointer">
+                        <div class="flex items-center">
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0 3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <span class="ml-4">Pengaturan</span>
+                        </div>
+                        <svg class="h-5 w-5 chevron text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                    </summary>
+                    <div class="pl-12 py-1 space-y-1">
+                        <a href="#rhk" class="sub-nav-link flex items-center py-2 text-sm text-gray-500 hover:text-indigo-600" data-target="page-rhk">Rencana Hasil Kerja</a>
+                        <a href="#tugas" class="sub-nav-link flex items-center py-2 text-sm text-gray-500 hover:text-indigo-600" data-target="page-tugas">Manajemen Tugas</a>
+                        <a href="#audit" class="sub-nav-link flex items-center py-2 text-sm text-gray-500 hover:text-indigo-600" data-target="page-audit">Audit Trail</a>
+                    </div>
+                </details>
+                <a href="#profil" class="nav-link flex items-center px-6 py-3 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600" data-target="page-profil">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                    <span class="ml-4">Profil Saya</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Overlay for mobile -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+
+        <!-- Konten Utama -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header class="flex justify-between items-center p-4 bg-white border-b border-gray-200 shrink-0">
+                 <div class="flex items-center">
+                    <button id="menu-btn" class="md:hidden text-gray-500 focus:outline-none mr-4">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <h1 id="page-title" class="text-xl font-bold text-gray-900 truncate">Tambah Aktivitas Baru</h1>
+                </div>
+                <div class="flex items-center ml-auto">
+                    <!-- Notifikasi -->
+                    <div class="relative">
+                        <button id="notification-btn" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+                            <span class="notification-badge">3</span>
+                        </button>
+                        <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border z-20">
+                            <div class="p-4 font-semibold border-b">Notifikasi</div>
+                            <div class="divide-y">
+                                <a href="#" class="block p-4 text-sm hover:bg-gray-50">
+                                    <p class="font-semibold text-gray-800">Aktivitas Disetujui</p>
+                                    <p class="text-gray-600">Aktivitas "Membuat laporan bulanan..." Anda telah disetujui oleh Reza Afrizal.</p>
+                                    <p class="text-xs text-gray-400 mt-1">5 menit yang lalu</p>
+                                </a>
+                                <a href="#" class="block p-4 text-sm hover:bg-gray-50">
+                                    <p class="font-semibold text-gray-800">Perlu Validasi</p>
+                                    <p class="text-gray-600">Dina Mariana mengajukan 2 aktivitas baru yang memerlukan validasi Anda.</p>
+                                    <p class="text-xs text-gray-400 mt-1">1 jam yang lalu</p>
+                                </a>
+                                 <a href="#" class="block p-4 text-sm hover:bg-gray-50">
+                                    <p class="font-semibold text-gray-800">Pengumuman Baru</p>
+                                    <p class="text-gray-600">Ada pengumuman baru mengenai jadwal libur Idul Adha.</p>
+                                    <p class="text-xs text-gray-400 mt-1">3 jam yang lalu</p>
+                                </a>
+                            </div>
+                            <a href="#" class="block p-3 text-center text-sm font-medium text-indigo-600 hover:bg-gray-50">Lihat Semua Notifikasi</a>
+                        </div>
+                    </div>
+                    <!-- Profil Pengguna -->
+                    <div class="ml-4 flex items-center">
+                         <div class="h-9 w-9 rounded-full bg-indigo-200 text-indigo-700 flex items-center justify-center font-bold text-sm">RA</div>
+                        <div class="ml-2 hidden sm:block">
+                            <p class="text-sm font-semibold text-gray-800">Reza Afrizal</p>
+                            <p class="text-xs text-gray-500">Kepala Bidang</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <main id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-8">
+                <!-- Halaman Pengumuman -->
+                <div id="page-pengumuman" class="page-content hidden">
+                     <div class="max-w-4xl mx-auto space-y-6">
+                        <div class="bg-white rounded-xl shadow-sm p-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <h2 class="text-xl font-bold text-gray-800">Jadwal Libur Idul Adha 2025</h2>
+                                <span class="text-sm text-gray-500">24 Juli 2025</span>
+                            </div>
+                            <p class="text-gray-600">Sehubungan dengan perayaan Hari Raya Idul Adha 1446 H, dengan ini diumumkan bahwa kegiatan perkantoran akan diliburkan pada tanggal 28-29 Juli 2025. Aktivitas akan kembali normal pada 30 Juli 2025. Selamat merayakan bersama keluarga.</p>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm p-6">
+                             <div class="flex items-center justify-between mb-2">
+                                <h2 class="text-xl font-bold text-gray-800">Pembaruan Sistem e-Activity v2.1</h2>
+                                <span class="text-sm text-gray-500">20 Juli 2025</span>
+                            </div>
+                            <p class="text-gray-600">Telah dilakukan pembaruan pada sistem e-Activity ke versi 2.1 yang mencakup penambahan fitur Laporan Bulanan dan perbaikan pada alur validasi. Mohon untuk melakukan clear cache pada browser Anda untuk mendapatkan pembaruan terkini.</p>
+                        </div>
+                     </div>
+                </div>
+                
+                <!-- Halaman Tambah Aktivitas -->
+                <div id="page-tambah-aktivitas" class="page-content">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <div class="p-6 md:p-8">
+                                <div class="mb-8">
+                                    <label class="block text-sm font-medium text-gray-700 mb-3">Pilih Tipe Aktivitas <span class="text-red-500">*</span></label>
+                                    <div class="segmented-control flex w-full border border-gray-300 rounded-lg overflow-hidden">
+                                        <div class="flex-1">
+                                            <input type="radio" name="activity_type" id="tugas-pokok" value="pokok" checked>
+                                            <label for="tugas-pokok" class="segmented-control-label">Tugas Pokok</label>
+                                        </div>
+                                        <div class="flex-1 border-l border-gray-300">
+                                            <input type="radio" name="activity_type" id="tugas-tambahan" value="tambahan">
+                                            <label for="tugas-tambahan" class="segmented-control-label">Tugas Tambahan</label>
+                                        </div>
+                                        <div class="flex-1 border-l border-gray-300">
+                                            <input type="radio" name="activity_type" id="cuti" value="cuti">
+                                            <label for="cuti" class="segmented-control-label">Cuti</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="main-form">
+                                    <div class="space-y-8">
+                                        <div>
+                                            <h2 class="text-lg font-semibold text-gray-900 mb-4">Detail Tugas</h2>
+                                            <div class="space-y-6">
+                                                <div>
+                                                    <label for="rencana-hasil" class="block text-sm font-medium text-gray-700 mb-1">Rencana Hasil Kerja <span class="text-red-500">*</span></label>
+                                                    <select id="rencana-hasil" class="form-select">
+                                                        <option>Terselenggaranya Implementasi Tata Kelola SPBE...</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label for="tugas" class="block text-sm font-medium text-gray-700 mb-1">Tugas Pokok <span class="text-red-500">*</span></label>
+                                                    <select id="tugas" class="form-select"></select>
+                                                </div>
+                                                <div>
+                                                    <label for="deskripsi" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi <span class="text-red-500">*</span></label>
+                                                    <textarea id="deskripsi" rows="4" class="form-textarea" placeholder="Jelaskan detail tugas..."></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h2 class="text-lg font-semibold text-gray-900 mb-4">Waktu Pelaksanaan</h2>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label for="start-time" class="block text-sm font-medium text-gray-700 mb-1">Jam Mulai <span class="text-red-500">*</span></label>
+                                                    <input type="time" id="start-time" class="form-input">
+                                                </div>
+                                                <div>
+                                                    <label for="end-time" class="block text-sm font-medium text-gray-700 mb-1">Jam Selesai <span class="text-red-500">*</span></label>
+                                                    <input type="time" id="end-time" class="form-input">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h2 class="text-lg font-semibold text-gray-900 mb-4">Bukti Dukung</h2>
+                                            <div class="space-y-6">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-1">Lampiran Bukti Dukung <span class="text-red-500">*</span></label>
+                                                    <div id="dropzone" class="file-drop-zone mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                                                        <div class="space-y-1 text-center">
+                                                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                            </svg>
+                                                            <div class="flex text-sm text-gray-600">
+                                                                <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500">
+                                                                    <span>Unggah file</span>
+                                                                    <input id="file-upload" name="file-upload" type="file" class="sr-only" accept=".pdf">
+                                                                </label>
+                                                                <p class="pl-1">atau seret dan lepas</p>
+                                                            </div>
+                                                            <p class="text-xs text-gray-500">Hanya file PDF, hingga 5MB</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-6 md:px-8 py-4 bg-gray-50 border-t border-gray-200 flex justify-end items-center space-x-3">
+                                <button type="button" class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Batal</button>
+                                <button type="submit" class="text-white bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg text-sm px-5 py-2.5">Simpan Aktivitas</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Halaman Menunggu Validasi -->
+                <div id="page-menunggu-validasi" class="page-content hidden">
+                    <div class="space-y-8">
+                        <!-- Grup Staf 1: Reza Hidayat -->
+                        <div class="bg-white rounded-xl shadow-sm">
+                           <div class="p-4 border-b border-gray-200">
+                               <div class="flex items-center justify-between">
+                                   <div class="flex items-center space-x-3">
+                                       <img class="h-10 w-10 rounded-full object-cover" src="https://placehold.co/100x100/E2E8F0/4A5568?text=RH" alt="Foto Profil Reza">
+                                       <div>
+                                           <p class="font-semibold text-gray-800">Reza Hidayat</p>
+                                           <p class="text-sm text-gray-500">Staf IT</p>
+                                       </div>
+                                   </div>
+                                   <span class="px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">1 Aktivitas</span>
+                               </div>
+                           </div>
+                           <div class="p-4 space-y-4">
+                                <!-- Aktivitas 1 dari Reza -->
+                                <div class="bg-gray-50 rounded-lg overflow-hidden activity-card">
+                                    <div class="p-4">
+                                        <p class="text-sm text-gray-500">Diajukan: 26 Juli 2025, 10:30</p>
+                                        <div class="mt-2"><p class="text-base font-semibold">Melakukan pengecekan rutin server</p><p class="text-sm text-gray-600 mt-1">Pengecekan meliputi status CPU, memori, dan disk...</p><div class="text-sm text-gray-500 mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 items-center"><p><strong class="font-medium text-gray-700">Waktu:</strong> 09:00-10:00</p><p><button type="button" class="view-attachment-btn text-indigo-600 hover:underline font-medium">Lihat Lampiran</button></p></div></div>
+                                    </div>
+                                    <div class="px-4 py-3 bg-gray-100 flex justify-end items-center space-x-3">
+                                        <button type="button" class="action-btn px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200" disabled>Tolak</button>
+                                        <button type="button" class="action-btn px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700" disabled>Setujui</button>
+                                    </div>
+                                </div>
+                           </div>
+                        </div>
+                         <!-- Grup Staf 2: Dina Mariana -->
+                        <div class="bg-white rounded-xl shadow-sm">
+                           <div class="p-4 border-b border-gray-200">
+                               <div class="flex items-center justify-between">
+                                   <div class="flex items-center space-x-3">
+                                       <img class="h-10 w-10 rounded-full object-cover" src="https://placehold.co/100x100/FEE2E2/991B1B?text=DM" alt="Foto Profil Dina">
+                                       <div>
+                                           <p class="font-semibold text-gray-800">Dina Mariana</p>
+                                           <p class="text-sm text-gray-500">Staf Administrasi</p>
+                                       </div>
+                                   </div>
+                                   <span class="px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">2 Aktivitas</span>
+                               </div>
+                           </div>
+                           <div class="p-4 space-y-4">
+                                <!-- Aktivitas 1 dari Dina -->
+                                <div class="bg-gray-50 rounded-lg overflow-hidden activity-card">
+                                    <div class="p-4">
+                                        <p class="text-sm text-gray-500">Diajukan: 26 Juli 2025, 11:15</p>
+                                        <div class="mt-2"><p class="text-base font-semibold">Membuat laporan bulanan kepegawaian</p><p class="text-sm text-gray-600 mt-1">Rekapitulasi absensi dan kinerja bulan Juni.</p><div class="text-sm text-gray-500 mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 items-center"><p><strong class="font-medium text-gray-700">Waktu:</strong> 10:00-11:00</p><p><button type="button" class="view-attachment-btn text-indigo-600 hover:underline font-medium">Lihat Lampiran</button></p></div></div>
+                                    </div>
+                                    <div class="px-4 py-3 bg-gray-100 flex justify-end items-center space-x-3">
+                                        <button type="button" class="action-btn px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200" disabled>Tolak</button>
+                                        <button type="button" class="action-btn px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700" disabled>Setujui</button>
+                                    </div>
+                                </div>
+                                 <!-- Aktivitas 2 dari Dina -->
+                                <div class="bg-gray-50 rounded-lg overflow-hidden activity-card">
+                                    <div class="p-4">
+                                        <p class="text-sm text-gray-500">Diajukan: 26 Juli 2025, 13:45</p>
+                                        <div class="mt-2"><p class="text-base font-semibold">Mengikuti Rapat Koordinasi Lintas Divisi</p><p class="text-sm text-gray-600 mt-1">Pembahasan mengenai persiapan acara HUT perusahaan.</p><div class="text-sm text-gray-500 mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 items-center"><p><strong class="font-medium text-gray-700">Waktu:</strong> 13:00-14:00</p><p><button type="button" class="view-attachment-btn text-indigo-600 hover:underline font-medium">Lihat Lampiran</button></p></div></div>
+                                    </div>
+                                    <div class="px-4 py-3 bg-gray-100 flex justify-end items-center space-x-3">
+                                        <button type="button" class="action-btn px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200" disabled>Tolak</button>
+                                        <button type="button" class="action-btn px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700" disabled>Setujui</button>
+                                    </div>
+                                </div>
+                           </div>
+                        </div>
+                        <!-- Grup Staf 3: Andi Pratama -->
+                        <div class="bg-white rounded-xl shadow-sm">
+                           <div class="p-4 border-b border-gray-200">
+                               <div class="flex items-center justify-between">
+                                   <div class="flex items-center space-x-3">
+                                       <img class="h-10 w-10 rounded-full object-cover" src="https://placehold.co/100x100/D1FAE5/065F46?text=AP" alt="Foto Profil Andi">
+                                       <div>
+                                           <p class="font-semibold text-gray-800">Andi Pratama</p>
+                                           <p class="text-sm text-gray-500">Staf IT</p>
+                                       </div>
+                                   </div>
+                                   <span class="px-2.5 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">1 Aktivitas</span>
+                               </div>
+                           </div>
+                           <div class="p-4 space-y-4">
+                                <!-- Aktivitas 1 dari Andi -->
+                                <div class="bg-gray-50 rounded-lg overflow-hidden activity-card">
+                                    <div class="p-4">
+                                        <p class="text-sm text-gray-500">Diajukan: 26 Juli 2025, 14:00</p>
+                                        <div class="mt-2"><p class="text-base font-semibold">Maintenance database aplikasi</p><p class="text-sm text-gray-600 mt-1">Optimalisasi query dan pengecekan index tabel.</p><div class="text-sm text-gray-500 mt-3 grid grid-cols-2 md:grid-cols-4 gap-2 items-center"><p><strong class="font-medium text-gray-700">Waktu:</strong> 11:00-12:00</p><p><button type="button" class="view-attachment-btn text-indigo-600 hover:underline font-medium">Lihat Lampiran</button></p></div></div>
+                                    </div>
+                                    <div class="px-4 py-3 bg-gray-100 flex justify-end items-center space-x-3">
+                                        <button type="button" class="action-btn px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200" disabled>Tolak</button>
+                                        <button type="button" class="action-btn px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700" disabled>Setujui</button>
+                                    </div>
+                                </div>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Halaman Disetujui -->
+                <div id="page-disetujui" class="page-content hidden">
+                    <div class="space-y-6">
+                        <!-- Contoh 1 -->
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">Andi Pratama (Staf IT)</p>
+                                        <p class="text-sm text-gray-500">Disetujui pada: 25 Juli 2025, 14:00</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">Disetujui</span>
+                                </div>
+                                <div class="mt-4 border-t border-gray-200 pt-4">
+                                    <p class="text-base font-semibold">Instalasi software pada laptop baru</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Contoh 2 -->
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">Dina Mariana (Staf Administrasi)</p>
+                                        <p class="text-sm text-gray-500">Disetujui pada: 26 Juli 2025, 09:30</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">Disetujui</span>
+                                </div>
+                                <div class="mt-4 border-t border-gray-200 pt-4">
+                                    <p class="text-base font-semibold">Membuat laporan bulanan kepegawaian</p>
+                                </div>
+                            </div>
+                        </div>
+                         <!-- Contoh 3 -->
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">Reza Hidayat (Staf IT)</p>
+                                        <p class="text-sm text-gray-500">Disetujui pada: 26 Juli 2025, 11:00</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">Disetujui</span>
+                                </div>
+                                <div class="mt-4 border-t border-gray-200 pt-4">
+                                    <p class="text-base font-semibold">Melakukan backup data mingguan</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Halaman Perlu Perbaikan -->
+                <div id="page-perlu-perbaikan" class="page-content hidden">
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">Reza Hidayat (Staf IT)</p>
+                                        <p class="text-sm text-gray-500">Dikembalikan pada: 25 Juli 2025, 16:30</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">Perlu Perbaikan</span>
+                                </div>
+                                <div class="mt-4 border-t border-gray-200 pt-4">
+                                    <p class="text-base font-semibold">Perbaikan bug pada aplikasi internal</p>
+                                    <div class="mt-2 p-3 bg-yellow-50 rounded-lg">
+                                        <p class="text-sm font-medium text-yellow-800">Catatan dari Atasan:</p>
+                                        <p class="text-sm text-yellow-700">Mohon lampirkan screenshot sebelum dan sesudah perbaikan bug dilakukan.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">Dina Mariana (Staf Administrasi)</p>
+                                        <p class="text-sm text-gray-500">Dikembalikan pada: 26 Juli 2025, 15:00</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">Perlu Perbaikan</span>
+                                </div>
+                                <div class="mt-4 border-t border-gray-200 pt-4">
+                                    <p class="text-base font-semibold">Mengikuti Rapat Koordinasi Lintas Divisi</p>
+                                    <div class="mt-2 p-3 bg-yellow-50 rounded-lg">
+                                        <p class="text-sm font-medium text-yellow-800">Catatan dari Atasan:</p>
+                                        <p class="text-sm text-yellow-700">Lampiran notulen rapat tidak lengkap. Mohon lampirkan versi final yang sudah ditandatangani.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Halaman Ditolak -->
+                <div id="page-ditolak" class="page-content hidden">
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">Andi Pratama (Staf IT)</p>
+                                        <p class="text-sm text-gray-500">Ditolak pada: 24 Juli 2025, 11:00</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-200 text-red-900">Ditolak Final</span>
+                                </div>
+                                <div class="mt-4 border-t border-gray-200 pt-4">
+                                    <p class="text-base font-semibold">Instalasi software Photoshop</p>
+                                    <div class="mt-2 p-3 bg-red-50 rounded-lg">
+                                        <p class="text-sm font-medium text-red-800">Alasan Penolakan:</p>
+                                        <p class="text-sm text-red-700">Aktivitas tidak sesuai dengan tugas pokok dan fungsi. Penggunaan software tidak berlisensi tidak diizinkan.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">Dina Mariana (Staf Administrasi)</p>
+                                        <p class="text-sm text-gray-500">Ditolak pada: 22 Juli 2025, 10:00</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-200 text-red-900">Ditolak Final</span>
+                                </div>
+                                <div class="mt-4 border-t border-gray-200 pt-4">
+                                    <p class="text-base font-semibold">Pengajuan Cuti</p>
+                                    <div class="mt-2 p-3 bg-red-50 rounded-lg">
+                                        <p class="text-sm font-medium text-red-800">Alasan Penolakan:</p>
+                                        <p class="text-sm text-red-700">Pengajuan cuti tidak dapat disetujui karena bentrok dengan jadwal audit internal.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Halaman Aktivitas Selesai -->
+                <div id="page-selesai" class="page-content hidden">
+                     <div class="bg-white rounded-xl shadow-sm">
+                        <div class="p-4 sm:p-6 border-b border-gray-200">
+                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <h2 class="text-xl font-bold text-gray-800">Rekap Aktivitas Disetujui</h2>
+                                <div class="w-full sm:w-auto grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <select id="filter-bulan" class="form-select w-full !py-2 !px-3 text-sm">
+                                        <option value="all">Semua Bulan</option>
+                                        <option value="7-2025">Juli 2025</option>
+                                        <option value="6-2025">Juni 2025</option>
+                                    </select>
+                                    <select id="filter-pegawai" class="form-select w-full !py-2 !px-3 text-sm">
+                                        <option value="all">Semua Pegawai</option>
+                                        <option value="Reza Hidayat">Reza Hidayat</option>
+                                        <option value="Dina Mariana">Dina Mariana</option>
+                                        <option value="Andi Pratama">Andi Pratama</option>
+                                    </select>
+                                    <input type="text" id="search-selesai" placeholder="Cari aktivitas..." class="form-input w-full !py-2 !px-3 text-sm">
+                                </div>
+                             </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-500">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">No</th>
+                                        <th scope="col" class="px-6 py-3">Tanggal Disetujui</th>
+                                        <th scope="col" class="px-6 py-3">Nama Staf</th>
+                                        <th scope="col" class="px-6 py-3">Uraian Tugas</th>
+                                        <th scope="col" class="px-6 py-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabel-selesai-body">
+                                    <tr class="bg-white border-b hover:bg-gray-50" data-month="7-2025" data-employee="Dina Mariana" data-deskripsi="Rekapitulasi absensi dan kinerja bulan Juni.">
+                                        <td class="px-6 py-4">1</td>
+                                        <td class="px-6 py-4">26 Jul 2025</td>
+                                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Dina Mariana</th>
+                                        <td class="px-6 py-4">Membuat laporan bulanan kepegawaian</td>
+                                        <td class="px-6 py-4 text-center"><button class="detail-btn font-medium text-indigo-600 hover:underline">Detail</button></td>
+                                    </tr>
+                                    <tr class="bg-white border-b hover:bg-gray-50" data-month="7-2025" data-employee="Andi Pratama" data-deskripsi="Instalasi meliputi OS Windows, Ms. Office, dan Antivirus.">
+                                        <td class="px-6 py-4">2</td>
+                                        <td class="px-6 py-4">25 Jul 2025</td>
+                                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Andi Pratama</th>
+                                        <td class="px-6 py-4">Instalasi software pada laptop baru</td>
+                                        <td class="px-6 py-4 text-center"><button class="detail-btn font-medium text-indigo-600 hover:underline">Detail</button></td>
+                                    </tr>
+                                    <tr class="bg-white border-b hover:bg-gray-50" data-month="7-2025" data-employee="Reza Hidayat" data-deskripsi="Melakukan backup seluruh database aplikasi ke cloud storage.">
+                                        <td class="px-6 py-4">3</td>
+                                        <td class="px-6 py-4">26 Jul 2025</td>
+                                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Reza Hidayat</th>
+                                        <td class="px-6 py-4">Melakukan backup data mingguan</td>
+                                        <td class="px-6 py-4 text-center"><button class="detail-btn font-medium text-indigo-600 hover:underline">Detail</button></td>
+                                    </tr>
+                                     <tr class="bg-white border-b hover:bg-gray-50" data-month="6-2025" data-employee="Reza Hidayat" data-deskripsi="Pengecekan meliputi status CPU, memori, dan disk.">
+                                        <td class="px-6 py-4">4</td>
+                                        <td class="px-6 py-4">20 Jun 2025</td>
+                                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Reza Hidayat</th>
+                                        <td class="px-6 py-4">Melakukan pengecekan rutin server</td>
+                                        <td class="px-6 py-4 text-center"><button class="detail-btn font-medium text-indigo-600 hover:underline">Detail</button></td>
+                                    </tr>
+                                     <tr class="bg-white border-b hover:bg-gray-50" data-month="6-2025" data-employee="Dina Mariana" data-deskripsi="Mengelola dan mengarsipkan surat masuk dan keluar bulan Mei.">
+                                        <td class="px-6 py-4">5</td>
+                                        <td class="px-6 py-4">15 Jun 2025</td>
+                                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">Dina Mariana</th>
+                                        <td class="px-6 py-4">Arsip surat masuk dan keluar</td>
+                                        <td class="px-6 py-4 text-center"><button class="detail-btn font-medium text-indigo-600 hover:underline">Detail</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                     </div>
+                </div>
+
+                <!-- Halaman Laporan -->
+                <div id="page-laporan" class="page-content hidden">
+                    <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Laporan & Statistik</h2>
+                        <div class="flex flex-col sm:flex-row items-center gap-4">
+                             <select id="filter-pegawai-laporan" class="form-select w-full sm:w-auto !py-2 !px-3 text-sm">
+                                <option value="all">Semua Pegawai</option>
+                                <option value="Reza Hidayat">Reza Hidayat</option>
+                                <option value="Dina Mariana">Dina Mariana</option>
+                                <option value="Andi Pratama">Andi Pratama</option>
+                            </select>
+                            <div class="flex items-center space-x-2">
+                                <label for="report-date" class="text-sm font-medium text-gray-700">Pilih Periode:</label>
+                                <input type="date" id="report-date" class="form-input w-auto" value="2025-07-26">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <div class="border-b border-gray-200">
+                            <nav id="report-tabs" class="-mb-px flex space-x-6" aria-label="Tabs">
+                                <button class="report-tab active-tab" data-target="report-harian">Harian</button>
+                                <button class="report-tab" data-target="report-mingguan">Mingguan</button>
+                                <button class="report-tab" data-target="report-bulanan">Bulanan</button>
+                            </nav>
+                        </div>
+                    </div>
+                    <div>
+                        <!-- Konten Harian -->
+                        <div id="report-harian" class="report-content space-y-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Total Aktivitas</h3><p class="mt-1 text-3xl font-bold text-gray-900">12</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Disetujui</h3><p class="mt-1 text-3xl font-bold text-green-600">9</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Menunggu</h3><p class="mt-1 text-3xl font-bold text-yellow-500">2</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Ditolak</h3><p class="mt-1 text-3xl font-bold text-red-600">1</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Capaian Terendah</h3><p class="mt-1 text-xl font-semibold text-orange-600">Andi Pratama</p><p class="text-sm text-gray-500">47% (4 jam)</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Aktivitas Tertinggi</h3><p class="mt-1 text-xl font-semibold text-indigo-600">Reza Hidayat</p><p class="text-sm text-gray-500">6 Aktivitas</p></div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4">Pencapaian Waktu Kerja Staf (26 Juli 2025)</h3>
+                                <div class="space-y-6">
+                                    <div>
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-sm font-medium text-gray-800">Reza Hidayat <span class="text-gray-500 font-normal">(6 Aktivitas)</span></span>
+                                            <span class="text-sm font-semibold text-indigo-600">82%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-indigo-600 h-2.5 rounded-full" style="width: 82%"></div></div>
+                                        <p class="text-xs text-gray-500 mt-1 text-right">7 jam dari 8.5 jam target</p>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-sm font-medium text-gray-800">Dina Mariana <span class="text-gray-500 font-normal">(4 Aktivitas)</span></span>
+                                            <span class="text-sm font-semibold text-green-600">100%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-green-600 h-2.5 rounded-full" style="width: 100%"></div></div>
+                                        <p class="text-xs text-gray-500 mt-1 text-right">8.5 jam dari 8.5 jam target</p>
+                                    </div>
+                                     <div>
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-sm font-medium text-gray-800">Andi Pratama <span class="text-gray-500 font-normal">(2 Aktivitas)</span></span>
+                                            <span class="text-sm font-semibold text-orange-500">47%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-orange-500 h-2.5 rounded-full" style="width: 47%"></div></div>
+                                        <p class="text-xs text-gray-500 mt-1 text-right">4 jam dari 8.5 jam target</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Konten Mingguan -->
+                        <div id="report-mingguan" class="report-content hidden space-y-6">
+                           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Total Aktivitas</h3><p class="mt-1 text-3xl font-bold text-gray-900">58</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Total Jam Kerja</h3><p class="mt-1 text-3xl font-bold text-indigo-600">37.5j</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Capaian Terendah</h3><p class="mt-1 text-xl font-semibold text-orange-600">Andi Pratama</p><p class="text-sm text-gray-500">75% (Rata-rata 6.4j)</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Aktivitas Tertinggi</h3><p class="mt-1 text-xl font-semibold text-indigo-600">Reza Hidayat</p><p class="text-sm text-gray-500">25 Aktivitas</p></div>
+                            </div>
+                           <div class="bg-white p-6 rounded-xl shadow-sm">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4">Total Jam Kerja Mingguan (21 - 26 Juli 2025)</h3>
+                                <div class="h-64 flex justify-around items-end space-x-2 sm:space-x-4 text-center">
+                                    <div class="flex-1"><div class="bg-indigo-200 rounded-t-lg mx-auto" style="height: 82%;"><span class="text-xs font-bold text-indigo-800">7j</span></div><p class="text-xs mt-2">Sen</p></div>
+                                    <div class="flex-1"><div class="bg-indigo-300 rounded-t-lg mx-auto" style="height: 94%;"><span class="text-xs font-bold text-indigo-800">8j</span></div><p class="text-xs mt-2">Sel</p></div>
+                                    <div class="flex-1"><div class="bg-indigo-400 rounded-t-lg mx-auto" style="height: 100%;"><span class="text-xs font-bold text-indigo-800">8.5j</span></div><p class="text-xs mt-2">Rab</p></div>
+                                    <div class="flex-1"><div class="bg-indigo-500 rounded-t-lg mx-auto" style="height: 70%;"><span class="text-xs font-bold text-indigo-800">6j</span></div><p class="text-xs mt-2">Kam</p></div>
+                                    <div class="flex-1"><div class="bg-indigo-600 rounded-t-lg mx-auto" style="height: 94%;"><span class="text-xs font-bold text-indigo-800">8j</span></div><p class="text-xs mt-2">Jum</p></div>
+                                </div>
+                                <p class="text-center text-sm mt-4 text-gray-600">Total Pencapaian Minggu Ini: <strong class="text-indigo-600">37.5 jam</strong> dari <strong class="text-gray-800">42.5 jam</strong> (88%)</p>
+                            </div>
+                        </div>
+                        <!-- Konten Bulanan -->
+                        <div id="report-bulanan" class="report-content hidden space-y-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Total Aktivitas</h3><p class="mt-1 text-3xl font-bold text-gray-900">215</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Rata-rata Jam/Hari</h3><p class="mt-1 text-3xl font-bold text-indigo-600">8.1j</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Capaian Terendah</h3><p class="mt-1 text-xl font-semibold text-orange-600">Andi Pratama</p><p class="text-sm text-gray-500">88% (Rata-rata 7.5j)</p></div>
+                                <div class="bg-white p-5 rounded-xl shadow-sm"><h3 class="text-sm font-medium text-gray-500">Aktivitas Tertinggi</h3><p class="mt-1 text-xl font-semibold text-indigo-600">Reza Hidayat</p><p class="text-sm text-gray-500">85 Aktivitas</p></div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4">Top Staf Berdasarkan Pencapaian Waktu (Juli 2025)</h3>
+                                <ul class="space-y-4">
+                                    <li class="flex justify-between items-center text-sm">
+                                        <div class="flex items-center">
+                                             <img src="https://placehold.co/100x100/FEE2E2/991B1B?text=DM" class="h-10 w-10 rounded-full mr-3">
+                                             <div>
+                                                <p class="font-medium text-gray-800">Dina Mariana</p>
+                                                <p class="text-xs text-gray-500">78 Aktivitas</p>
+                                             </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-bold text-green-600">102%</p>
+                                            <p class="text-xs text-gray-500">Rata-rata 8.7j/hari</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex justify-between items-center text-sm">
+                                        <div class="flex items-center">
+                                             <img src="https://placehold.co/100x100/E2E8F0/4A5568?text=RH" class="h-10 w-10 rounded-full mr-3">
+                                             <div>
+                                                <p class="font-medium text-gray-800">Reza Hidayat</p>
+                                                <p class="text-xs text-gray-500">85 Aktivitas</p>
+                                             </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-bold text-indigo-600">95%</p>
+                                            <p class="text-xs text-gray-500">Rata-rata 8.1j/hari</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex justify-between items-center text-sm">
+                                        <div class="flex items-center">
+                                             <img src="https://placehold.co/100x100/D1FAE5/065F46?text=AP" class="h-10 w-10 rounded-full mr-3">
+                                             <div>
+                                                <p class="font-medium text-gray-800">Andi Pratama</p>
+                                                <p class="text-xs text-gray-500">52 Aktivitas</p>
+                                             </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-bold text-orange-500">88%</p>
+                                            <p class="text-xs text-gray-500">Rata-rata 7.5j/hari</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Halaman Tim Kerja -->
+                <div id="page-tim-kerja" class="page-content hidden">
+                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <!-- Staf Card 1: Online -->
+                        <div class="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center text-center">
+                            <img class="h-24 w-24 rounded-full object-cover ring-4 ring-green-200" src="https://placehold.co/100x100/E2E8F0/4A5568?text=RH" alt="Foto Profil Reza">
+                            <h3 class="mt-4 font-semibold text-lg text-gray-800">Reza Hidayat</h3>
+                            <p class="text-sm text-gray-500">Staf IT</p>
+                            <div class="mt-4 flex items-center justify-center space-x-2">
+                                <span class="h-2.5 w-2.5 bg-green-500 rounded-full"></span>
+                                <span class="text-sm font-medium text-green-700">Online</span>
+                            </div>
+                             <button class="mt-5 w-full px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-100 rounded-lg hover:bg-indigo-200">Lihat Profil</button>
+                        </div>
+                        <!-- Staf Card 2: Offline -->
+                        <div class="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center text-center">
+                            <img class="h-24 w-24 rounded-full object-cover ring-4 ring-gray-200" src="https://placehold.co/100x100/FEE2E2/991B1B?text=DM" alt="Foto Profil Dina">
+                            <h3 class="mt-4 font-semibold text-lg text-gray-800">Dina Mariana</h3>
+                            <p class="text-sm text-gray-500">Staf Administrasi</p>
+                            <div class="mt-4 flex items-center justify-center space-x-2">
+                                <span class="h-2.5 w-2.5 bg-gray-400 rounded-full"></span>
+                                <span class="text-sm font-medium text-gray-600">Offline</span>
+                            </div>
+                             <button class="mt-5 w-full px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-100 rounded-lg hover:bg-indigo-200">Lihat Profil</button>
+                        </div>
+                         <!-- Staf Card 3: Online -->
+                        <div class="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center text-center">
+                            <img class="h-24 w-24 rounded-full object-cover ring-4 ring-green-200" src="https://placehold.co/100x100/D1FAE5/065F46?text=AP" alt="Foto Profil Andi">
+                            <h3 class="mt-4 font-semibold text-lg text-gray-800">Andi Pratama</h3>
+                            <p class="text-sm text-gray-500">Staf IT</p>
+                            <div class="mt-4 flex items-center justify-center space-x-2">
+                                <span class="h-2.5 w-2.5 bg-green-500 rounded-full"></span>
+                                <span class="text-sm font-medium text-green-700">Online</span>
+                            </div>
+                             <button class="mt-5 w-full px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-100 rounded-lg hover:bg-indigo-200">Lihat Profil</button>
+                        </div>
+                     </div>
+                </div>
+                
+                <!-- Halaman Audit Trail -->
+                <div id="page-audit" class="page-content hidden">
+                     <div class="bg-white rounded-xl shadow-sm">
+                        <div class="p-4 sm:p-6 border-b border-gray-200">
+                             <h2 class="text-xl font-bold text-gray-800">Audit Trail</h2>
+                             <p class="text-sm text-gray-500 mt-1">Rekam jejak seluruh aktivitas penting dalam sistem.</p>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-500">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">Waktu</th>
+                                        <th scope="col" class="px-6 py-3">Pengguna</th>
+                                        <th scope="col" class="px-6 py-3">Aksi</th>
+                                        <th scope="col" class="px-6 py-3">Detail</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-white border-b hover:bg-gray-50">
+                                        <td class="px-6 py-4">26 Jul 2025, 11:00</td>
+                                        <td class="px-6 py-4 font-medium text-gray-900">Reza Afrizal</td>
+                                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">SETUJU</span></td>
+                                        <td class="px-6 py-4">Menyetujui aktivitas "Melakukan backup data mingguan" oleh Reza Hidayat.</td>
+                                    </tr>
+                                    <tr class="bg-white border-b hover:bg-gray-50">
+                                        <td class="px-6 py-4">26 Jul 2025, 10:30</td>
+                                        <td class="px-6 py-4 font-medium text-gray-900">Reza Hidayat</td>
+                                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full">KIRIM</span></td>
+                                        <td class="px-6 py-4">Mengajukan aktivitas baru: "Melakukan pengecekan rutin server".</td>
+                                    </tr>
+                                     <tr class="bg-white border-b hover:bg-gray-50">
+                                        <td class="px-6 py-4">26 Jul 2025, 09:30</td>
+                                        <td class="px-6 py-4 font-medium text-gray-900">Reza Afrizal</td>
+                                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-medium text-orange-800 bg-orange-100 rounded-full">REVISI</span></td>
+                                        <td class="px-6 py-4">Mengembalikan aktivitas "Rapat Koordinasi" oleh Dina Mariana untuk perbaikan.</td>
+                                    </tr>
+                                     <tr class="bg-white border-b hover:bg-gray-50">
+                                        <td class="px-6 py-4">25 Jul 2025, 14:00</td>
+                                        <td class="px-6 py-4 font-medium text-gray-900">Reza Afrizal</td>
+                                        <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">SETUJU</span></td>
+                                        <td class="px-6 py-4">Menyetujui aktivitas "Instalasi software..." oleh Andi Pratama.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                     </div>
+                </div>
+
+                <!-- Halaman Profil Saya -->
+                <div id="page-profil" class="page-content hidden">
+                    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="p-6 md:p-8">
+                            <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+                                <div class="shrink-0 text-center">
+                                    <div class="h-32 w-32 rounded-full bg-indigo-200 text-indigo-700 flex items-center justify-center font-bold text-4xl mx-auto ring-4 ring-indigo-200">RA</div>
+                                    <button class="mt-4 text-sm text-indigo-600 hover:underline">Ganti Foto</button>
+                                </div>
+                                <div class="flex-1 w-full">
+                                    <div class="flex justify-between items-center mb-6">
+                                        <h2 class="text-2xl font-bold text-gray-900">Reza Afrizal</h2>
+                                        <button class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">Edit Profil</button>
+                                    </div>
+                                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                                        <div class="sm:col-span-1">
+                                            <dt class="font-medium text-gray-500">Jabatan</dt>
+                                            <dd class="mt-1 text-gray-900">Kepala Bidang Aplikasi Informatika</dd>
+                                        </div>
+                                        <div class="sm:col-span-1">
+                                            <dt class="font-medium text-gray-500">NIP</dt>
+                                            <dd class="mt-1 text-gray-900">19800411 200502 1 003</dd>
+                                        </div>
+                                        <div class="sm:col-span-1">
+                                            <dt class="font-medium text-gray-500">Email</dt>
+                                            <dd class="mt-1 text-gray-900">reza.afrizal@kalbarprov.go.id</dd>
+                                        </div>
+                                        <div class="sm:col-span-1">
+                                            <dt class="font-medium text-gray-500">Nomor Telepon</dt>
+                                            <dd class="mt-1 text-gray-900">081522800150</dd>
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <dt class="font-medium text-gray-500">Alamat Kantor</dt>
+                                            <dd class="mt-1 text-gray-900">Jalan Ahmad Yani Gedung Pelayanan Terpadu Lantai 6 Komplek Kantor Gubernur Kalimantan Barat, Bansir Darat, Kec. Pontianak Tenggara, Kota Pontianak, Kalimantan Barat</dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Halaman Rencana Hasil Kerja -->
+                <div id="page-rhk" class="page-content hidden">
+                    <div class="space-y-8">
+                        <div class="bg-white rounded-xl shadow-sm p-6 md:p-8">
+                            <h2 class="text-xl font-bold text-gray-800 mb-6">Tambah Rencana Hasil Kerja (RHK) Baru</h2>
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="rhk-tahun" class="block text-sm font-medium text-gray-700 mb-1">Tahun</label>
+                                    <select id="rhk-tahun" class="form-select"><option>2025</option><option>2024</option></select>
+                                </div>
+                                <div>
+                                    <label for="rhk-deskripsi" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi RHK</label>
+                                    <textarea id="rhk-deskripsi" rows="3" class="form-textarea" placeholder="cth: Tersusunnya laporan keuangan..."></textarea>
+                                </div>
+                                <div class="flex justify-end pt-2">
+                                    <button class="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">Simpan RHK</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm">
+                            <div class="p-6 md:p-8">
+                                <h2 class="text-xl font-bold text-gray-800 mb-6">Daftar Rencana Hasil Kerja</h2>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm text-left text-gray-500">
+                                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                            <tr>
+                                                <th class="px-6 py-3">Tahun</th>
+                                                <th class="px-6 py-3">Deskripsi</th>
+                                                <th class="px-6 py-3 text-right">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="bg-white border-b hover:bg-gray-50">
+                                                <td class="px-6 py-4">2025</td>
+                                                <td class="px-6 py-4 font-medium text-gray-900">Terselenggaranya Implementasi Tata Kelola SPBE yang Optimal</td>
+                                                <td class="px-6 py-4 flex justify-end space-x-2">
+                                                    <button class="p-2 text-gray-500 hover:text-indigo-600"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button>
+                                                    <button class="p-2 text-gray-500 hover:text-red-600"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Halaman Manajemen Tugas -->
+                <div id="page-tugas" class="page-content hidden">
+                    <div class="bg-white rounded-xl shadow-sm">
+                        <div class="p-4 sm:p-6 border-b border-gray-200">
+                             <div id="tugas-tabs" class="inline-flex items-center space-x-1 bg-gray-100 p-1 rounded-lg">
+                                 <button class="tugas-tab-btn active-tab" data-target="tugas-pokok-content">Tugas Pokok</button>
+                                 <button class="tugas-tab-btn" data-target="tugas-tambahan-content">Tugas Tambahan</button>
+                             </div>
+                        </div>
+                        <div class="p-6 md:p-8">
+                            <div id="tugas-pokok-content" class="tugas-tab-content space-y-8">
+                                <div class="p-6 border border-gray-200 rounded-lg">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Tambah Tugas Pokok Baru</h3>
+                                    <div class="space-y-4">
+                                        <textarea rows="3" class="form-textarea" placeholder="Ketik deskripsi tugas pokok..."></textarea>
+                                        <div class="flex justify-end"><button class="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">Simpan</button></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Daftar Tugas Pokok</h3>
+                                    <ul class="space-y-2"><li class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"><span>Melakukan pengecekan rutin server</span><div class="flex space-x-1"><button class="p-2 text-gray-500 hover:text-indigo-600"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button><button class="p-2 text-gray-500 hover:text-red-600"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></div></li></ul>
+                                </div>
+                            </div>
+                            <div id="tugas-tambahan-content" class="tugas-tab-content hidden space-y-8">
+                               <div class="p-6 border border-gray-200 rounded-lg">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Tambah Tugas Tambahan Baru</h3>
+                                    <div class="space-y-4">
+                                        <textarea rows="3" class="form-textarea" placeholder="Ketik deskripsi tugas tambahan..."></textarea>
+                                        <div class="flex justify-end"><button class="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">Simpan</button></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Daftar Tugas Tambahan</h3>
+                                    <ul class="space-y-2"><li class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"><span>Mengikuti Rapat Koordinasi Lintas Divisi</span><div class="flex space-x-1"><button class="p-2 text-gray-500 hover:text-indigo-600"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button><button class="p-2 text-gray-500 hover:text-red-600"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></div></li></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modal untuk Detail Aktivitas Selesai -->
+    <div id="detail-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full transform transition-all">
+            <div class="p-5 border-b flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-900">Detail Aktivitas</h3>
+                <button id="close-detail-modal-btn" class="text-gray-400 hover:text-gray-800 rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+            </div>
+            <div id="detail-modal-content" class="p-6 space-y-4">
+                <!-- Konten akan diisi oleh JavaScript -->
+            </div>
+             <div class="px-6 py-3 bg-gray-50 border-t flex justify-end">
+                <button id="close-detail-modal-btn-2" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal untuk Melihat Lampiran -->
+    <div id="attachment-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full transform transition-all"><div class="p-5 border-b flex justify-between items-center"><h3 class="text-lg font-semibold text-gray-900">Pratinjau Bukti Dukung</h3><button id="close-attachment-modal-btn" class="text-gray-400 hover:text-gray-800 rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button></div><div class="p-6"><img src="https://placehold.co/800x600/F3F4F6/4B5563?text=Contoh+Bukti+Dukung.pdf" alt="Contoh Bukti Dukung" class="w-full h-auto rounded-lg shadow-inner bg-gray-50"></div></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile sidebar toggle
+            const menuBtn = document.getElementById('menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (menuBtn && sidebar && overlay) {
+                menuBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('-translate-x-full');
+                    overlay.classList.toggle('hidden');
+                });
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                });
+            }
+
+            function setupPageNavigation() {
+                const navLinks = document.querySelectorAll('#sidebar-nav a');
+                const pageTitle = document.getElementById('page-title');
+                const mainContent = document.getElementById('main-content');
+                const sidebarNav = document.getElementById('sidebar-nav');
+                if (!pageTitle || !mainContent || !sidebarNav) return;
+
+                navLinks.forEach(link => {
+                    link.addEventListener('click', e => {
+                        e.preventDefault();
+                        const targetId = link.dataset.target;
+                        if (!targetId) return;
+                        
+                        mainContent.querySelectorAll('.page-content').forEach(page => page.classList.add('hidden'));
+                        const targetPage = document.getElementById(targetId);
+                        if (targetPage) {
+                            targetPage.classList.remove('hidden');
+                        }
+                        
+                        let titleText = link.querySelector('span')?.textContent || link.textContent.trim();
+                        if(link.classList.contains('sub-nav-link')) {
+                             const parentSummary = link.closest('details').querySelector('summary span');
+                             if(parentSummary) {
+                                titleText = `${parentSummary.textContent.trim()} / ${titleText}`;
+                             }
+                        }
+                        pageTitle.textContent = titleText;
+                        
+                        sidebarNav.querySelectorAll('.nav-link, .sub-nav-link').forEach(nav => nav.classList.remove('active'));
+                        link.classList.add('active');
+                        
+                        const detailsParent = link.closest('details');
+                        if (detailsParent && !detailsParent.open) {
+                            detailsParent.open = true;
+                        }
+
+                        // Close sidebar on mobile after navigation
+                        if (window.innerWidth < 768) {
+                            sidebar.classList.add('-translate-x-full');
+                            overlay.classList.add('hidden');
+                        }
+                    });
+                });
+                const defaultPageLink = document.querySelector('.nav-link[data-target="page-tambah-aktivitas"]');
+                if (defaultPageLink) defaultPageLink.click();
+            }
+
+            function setupFormLogic() {
+                const tugasData = {
+                    pokok: [{ value: 'cek_server', text: 'Melakukan pengecekan rutin server' },{ value: 'maintenance_db', text: 'Maintenance database aplikasi' },{ value: 'backup_data', text: 'Melakukan backup data mingguan' }],
+                    tambahan: [{ value: 'rapat_koordinasi', text: 'Mengikuti Rapat Koordinasi Lintas Divisi' },{ value: 'bimbingan_mhs', text: 'Memberikan bimbingan teknis mahasiswa magang' }]
+                };
+                const activityTypeRadios = document.querySelectorAll('input[name="activity_type"]');
+                const mainForm = document.getElementById('main-form');
+                const tugasDropdown = document.getElementById('tugas');
+                const tugasLabel = document.querySelector('label[for="tugas"]');
+                function populateTugasDropdown(type) {
+                    if (!tugasDropdown || !tugasData[type]) return;
+                    tugasDropdown.innerHTML = '<option selected disabled>Pilih tugas</option>';
+                    tugasData[type].forEach(opt => {
+                        const optionElement = document.createElement('option');
+                        optionElement.value = opt.value;
+                        optionElement.textContent = opt.text;
+                        tugasDropdown.appendChild(optionElement);
+                    });
+                }
+                if (mainForm && activityTypeRadios.length > 0) {
+                    activityTypeRadios.forEach(radio => {
+                        radio.addEventListener('change', e => {
+                            const type = e.target.value;
+                            mainForm.classList.toggle('hidden', type === 'cuti');
+                            if (type === 'pokok' || type === 'tambahan') {
+                                populateTugasDropdown(type);
+                                if (tugasLabel) {
+                                    tugasLabel.innerHTML = (type === 'pokok' ? 'Tugas Pokok' : 'Tugas Tambahan') + ' <span class="text-red-500">*</span>';
+                                }
+                            }
+                        });
+                    });
+                }
+                populateTugasDropdown('pokok');
+            }
+            
+            function setupValidationFlow() {
+                const modal = document.getElementById('attachment-modal');
+                const closeModalBtn = document.getElementById('close-attachment-modal-btn');
+                if (!modal || !closeModalBtn) return;
+                let currentCard = null;
+                const showModal = () => modal.classList.remove('hidden');
+                const hideModal = () => {
+                    modal.classList.add('hidden');
+                    if (currentCard) {
+                        currentCard.querySelectorAll('.action-btn').forEach(btn => { btn.disabled = false; });
+                        currentCard = null;
+                    }
+                };
+                closeModalBtn.addEventListener('click', hideModal);
+                document.querySelectorAll('.view-attachment-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        currentCard = e.target.closest('.activity-card');
+                        showModal();
+                    });
+                });
+            }
+
+            function setupNotifications() {
+                const notifBtn = document.getElementById('notification-btn');
+                const notifDropdown = document.getElementById('notification-dropdown');
+                if (!notifBtn || !notifDropdown) return;
+                notifBtn.addEventListener('click', () => {
+                    notifDropdown.classList.toggle('hidden');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+                        notifDropdown.classList.add('hidden');
+                    }
+                });
+            }
+            
+            function setupDetailModal() {
+                const detailModal = document.getElementById('detail-modal');
+                const closeModalBtns = document.querySelectorAll('#close-detail-modal-btn, #close-detail-modal-btn-2');
+                const detailContent = document.getElementById('detail-modal-content');
+                if (!detailModal || !closeModalBtns.length || !detailContent) return;
+
+                const showDetailModal = (data) => {
+                    detailContent.innerHTML = `
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                            <div class="sm:col-span-1"><dt class="font-medium text-gray-500">Nama Staf</dt><dd class="mt-1 text-gray-900 font-semibold">${data.nama}</dd></div>
+                            <div class="sm:col-span-1"><dt class="font-medium text-gray-500">Tanggal Disetujui</dt><dd class="mt-1 text-gray-900">${data.tanggal}</dd></div>
+                            <div class="sm:col-span-2"><dt class="font-medium text-gray-500">Uraian Tugas</dt><dd class="mt-1 text-gray-900">${data.tugas}</dd></div>
+                            <div class="sm:col-span-2"><dt class="font-medium text-gray-500">Deskripsi</dt><dd class="mt-1 text-gray-900">${data.deskripsi}</dd></div>
+                            <div class="sm:col-span-2"><dt class="font-medium text-gray-500">RHK Terkait</dt><dd class="mt-1 text-gray-900">Terselenggaranya Implementasi Tata Kelola SPBE yang Optimal</dd></div>
+                            <div class="sm:col-span-1"><dt class="font-medium text-gray-500">Waktu</dt><dd class="mt-1 text-gray-900">09:00 - 10:00</dd></div>
+                             <div class="sm:col-span-1"><dt class="font-medium text-gray-500">Bukti Dukung</dt><dd class="mt-1 text-gray-900"><a href="#" class="text-indigo-600 hover:underline">Lihat Lampiran.pdf</a></dd></div>
+                        </dl>
+                    `;
+                    detailModal.classList.remove('hidden');
+                };
+                const hideDetailModal = () => detailModal.classList.add('hidden');
+
+                closeModalBtns.forEach(btn => btn.addEventListener('click', hideDetailModal));
+                
+                document.querySelectorAll('#tabel-selesai-body .detail-btn').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        const row = e.target.closest('tr');
+                        const data = {
+                            nama: row.querySelector('th').textContent,
+                            tanggal: row.cells[1].textContent,
+                            tugas: row.cells[3].textContent,
+                            deskripsi: row.dataset.deskripsi,
+                        };
+                        showDetailModal(data);
+                    });
+                });
+            }
+
+            function setupSelesaiFilters() {
+                const searchInput = document.getElementById('search-selesai');
+                const monthFilter = document.getElementById('filter-bulan');
+                const employeeFilter = document.getElementById('filter-pegawai');
+                const tableBody = document.getElementById('tabel-selesai-body');
+                if (!searchInput || !monthFilter || !employeeFilter || !tableBody) return;
+
+                const allRows = Array.from(tableBody.querySelectorAll('tr'));
+                function applyFilters() {
+                    const searchTerm = searchInput.value.toLowerCase();
+                    const selectedMonth = monthFilter.value;
+                    const selectedEmployee = employeeFilter.value;
+
+                    allRows.forEach(row => {
+                        const rowEmployee = row.dataset.employee;
+                        const rowMonth = row.dataset.month;
+                        
+                        const matchesSearch = row.textContent.toLowerCase().includes(searchTerm);
+                        const matchesMonth = selectedMonth === 'all' || rowMonth === selectedMonth;
+                        const matchesEmployee = selectedEmployee === 'all' || rowEmployee === selectedEmployee;
+
+                        row.style.display = (matchesSearch && matchesMonth && matchesEmployee) ? '' : 'none';
+                    });
+                }
+                searchInput.addEventListener('keyup', applyFilters);
+                monthFilter.addEventListener('change', applyFilters);
+                employeeFilter.addEventListener('change', applyFilters);
+            }
+
+            function setupTugasTabs() {
+                const tabsContainer = document.getElementById('tugas-tabs');
+                if (!tabsContainer) return;
+                tabsContainer.addEventListener('click', (e) => {
+                    const clickedTab = e.target.closest('.tugas-tab-btn');
+                    if (!clickedTab) return;
+                    tabsContainer.querySelectorAll('.tugas-tab-btn').forEach(btn => btn.classList.remove('active-tab'));
+                    clickedTab.classList.add('active-tab');
+                    const targetId = clickedTab.dataset.target;
+                    document.querySelectorAll('.tugas-tab-content').forEach(content => {
+                        content.classList.toggle('hidden', content.id !== targetId);
+                    });
+                });
+            }
+
+            function setupReportTabs() {
+                const tabsContainer = document.getElementById('report-tabs');
+                if (!tabsContainer) return;
+
+                const tabs = tabsContainer.querySelectorAll('.report-tab');
+                const contents = document.querySelectorAll('.report-content');
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        tabs.forEach(t => t.classList.remove('active-tab'));
+                        tab.classList.add('active-tab');
+                        const targetId = tab.dataset.target;
+                        contents.forEach(content => {
+                            content.classList.toggle('hidden', content.id !== targetId);
+                        });
+                    });
+                });
+            }
+
+            setupPageNavigation();
+            setupFormLogic();
+            setupValidationFlow();
+            setupSelesaiFilters();
+            setupTugasTabs();
+            setupNotifications();
+            setupDetailModal();
+            setupReportTabs();
+        });
+    </script>
+</body>
+</html>
